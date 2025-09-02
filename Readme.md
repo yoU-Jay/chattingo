@@ -339,33 +339,4 @@ chattingo/
 
 ---
 
-## 📧 **Email System for Organizers**
-
-This repository includes a comprehensive Python email automation system for managing participant communications:
-
-### **Features**
-- **Automated Email Campaigns** - Timeline-based email automation
-- **Professional Templates** - Beautiful HTML email templates  
-- **Participant Management** - CSV-based participant tracking
-- **Bulk Email Sending** - Efficient bulk email processing
-- **Interactive CLI** - Easy-to-use command-line interface
-
-### **Quick Setup**
-```bash
-cd email_system
-python setup.py
-python main.py --interactive
-```
-
-### **Email Timeline**
-- **Registration**: Welcome email with hackathon details
-- **Sept 5**: Kickoff session reminder
-- **Sept 7**: Build period start notification
-- **Sept 9**: Submission deadline reminder
-- **Sept 10**: Final submission reminder
-
-For detailed documentation, see [`email_system/README.md`](email_system/README.md)
-
----
-
 **Good luck with your hackathon project! 🚀**
