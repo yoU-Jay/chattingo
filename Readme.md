@@ -5,7 +5,7 @@ A full-stack real-time chat application built with React, Spring Boot, and WebSo
 ## 🚨 **IMPORTANT: Registration Required**
 
 ### **📝 [REGISTER NOW](https://forms.gle/NgNJNg8yQvPaA1Vz9)** 
-**Deadline: September 5, 2024**
+**Deadline: September 5, 2025**
 
 **What you need to register:**
 - Your Name
@@ -14,7 +14,7 @@ A full-stack real-time chat application built with React, Spring Boot, and WebSo
 - GitHub Profile URL
 
 ### **📤 [SUBMISSION FORM](https://forms.gle/ww3vPN29JTNRqzM27)**
-**Deadline: September 10, 2024 (11:59 PM)**
+**Deadline: September 10, 2025 (11:59 PM)**
 
 ### **📂 Repository Access**
 **Repository URL**: https://github.com/iemafzalhassan/chattingo
@@ -336,6 +336,35 @@ chattingo/
 | Engagement | 2 | Active participation |
 | Creativity | 2 | Unique features/implementation |
 | Documentation | 10 | README, blog, video |
+
+---
+
+## 📧 **Email System for Organizers**
+
+This repository includes a comprehensive Python email automation system for managing participant communications:
+
+### **Features**
+- **Automated Email Campaigns** - Timeline-based email automation
+- **Professional Templates** - Beautiful HTML email templates  
+- **Participant Management** - CSV-based participant tracking
+- **Bulk Email Sending** - Efficient bulk email processing
+- **Interactive CLI** - Easy-to-use command-line interface
+
+### **Quick Setup**
+```bash
+cd email_system
+python setup.py
+python main.py --interactive
+```
+
+### **Email Timeline**
+- **Registration**: Welcome email with hackathon details
+- **Sept 5**: Kickoff session reminder
+- **Sept 7**: Build period start notification
+- **Sept 9**: Submission deadline reminder
+- **Sept 10**: Final submission reminder
+
+For detailed documentation, see [`email_system/README.md`](email_system/README.md)
 
 ---
 
