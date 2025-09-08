@@ -87,12 +87,12 @@ cd backend
 # Copy environment template
 cp .env.example .env
 
-# Generate secure JWT secret
-openssl rand -base64 64
+# Generate secure JWT secret (32 bytes = 256 bits)
+openssl rand -base64 32
 
-# Edit .env file with your values:
+# Edit .env file with your generated JWT secret:
 # JWT_SECRET=<your-generated-secret>
-# SPRING_DATASOURCE_PASSWORD= (leave empty for local MySQL)
+# Leave SPRING_DATASOURCE_PASSWORD empty for local MySQL
 ```
 
 #### **Step 5: Start Backend**
@@ -101,20 +101,27 @@ openssl rand -base64 64
 ./mvnw spring-boot:run
 ```
 
-#### **Step 6: Start Frontend**
+#### **Step 6: Configure Frontend**
 ```bash
 cd frontend
 
+# Copy environment template
+cp .env.example .env
+
 # Install dependencies
 npm install
+```
 
+#### **Step 7: Start Frontend**
+```bash
 # Start development server
 npm start
 ```
 
-#### **Step 7: Verify Setup**
+#### **Step 8: Verify Setup**
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080
+- **Health Check**: http://localhost:8080/actuator/health
 - **Test signup**: Create a new user account
 
 ### Development Workflow
@@ -163,10 +170,10 @@ sudo apt install openjdk-17-jdk
 mysql -u root -e "CREATE DATABASE chattingo_db;"
 ```
 
-#### **"JWT secret too short"**
+#### **"JWT secret too short" or "WeakKeyException"**
 ```bash
-# Generate proper secret
-openssl rand -base64 64
+# Generate proper 256-bit secret
+openssl rand -base64 32
 # Copy output to JWT_SECRET in .env
 ```
 
@@ -191,6 +198,39 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
+#### **"Backend won't start"**
+```bash
+# Check if port 8080 is in use
+lsof -ti:8080 | xargs kill -9
+
+# Check Java version (must be 17+)
+java -version
+
+# Check if database is running
+brew services start mysql  # macOS
+sudo systemctl start mysql  # Linux
+```
+
+#### **"Frontend won't start"**
+```bash
+# Check if port 3000 is in use
+lsof -ti:3000 | xargs kill -9
+
+# Check Node.js version (must be 18+)
+node -v
+
+# Clear npm cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### **"WebSocket connection failed"**
+- Ensure backend is running on port 8080
+- Check browser console for CORS errors
+- Verify `REACT_APP_WS_URL` in frontend .env file
+- Test WebSocket endpoint: `curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" http://localhost:8080/ws`
+
 ---
 
 ## ⚙️ Environment Configuration
@@ -207,8 +247,8 @@ You need to configure these essential files before running the application:
 Create a `.env` file in the `backend/` directory with these required variables:
 
 **Security Settings (Required)**
-- `JWT_SECRET`: A 64-character secret key for JWT token generation
-- `MYSQL_ROOT_PASSWORD`: A secure password for your MySQL database
+- `JWT_SECRET`: A 32-byte (256-bit) Base64 encoded secret for JWT token generation
+- `MYSQL_ROOT_PASSWORD`: A secure password for your MySQL database (optional for local dev)
 
 **Domain Settings (Required)**
 - `CORS_ALLOWED_ORIGINS`: Your frontend domain(s) for CORS policy
@@ -216,6 +256,7 @@ Create a `.env` file in the `backend/` directory with these required variables:
 
 **Database Settings (Default)**
 - `SPRING_DATASOURCE_USERNAME`: Database username (default: root)
+- `SPRING_DATASOURCE_PASSWORD`: Database password (empty for local MySQL)
 - `MYSQL_DATABASE`: Database name (default: chattingo_db)
 
 ### Frontend Configuration (`frontend/.env`)
@@ -223,12 +264,17 @@ Create a `.env` file in the `backend/` directory with these required variables:
 Create a `.env` file in the `frontend/` directory:
 
 **API Configuration (Required)**
-- `REACT_APP_API_URL`: Your backend API URL
+- `REACT_APP_API_URL`: Your backend API URL (http://localhost:8080 for local dev)
+
+**WebSocket Configuration (Optional)**
+- `REACT_APP_WS_URL`: WebSocket URL for real-time messaging
+- `REACT_APP_ENV`: Environment setting (development/production)
+- `REACT_APP_DEBUG`: Debug mode (true/false)
 
 ### Generating Secure Secrets
 
-**JWT Secret**: Generate a 64-character random string for JWT token signing
-**Database Password**: Create a strong password for your MySQL root user
+**JWT Secret**: Generate a 32-byte (256-bit) Base64 encoded secret: `openssl rand -base64 32`
+**Database Password**: Create a strong password for your MySQL root user (optional for local development)
 
 ### CORS Configuration
 
@@ -244,7 +290,7 @@ Configure Cross-Origin Resource Sharing (CORS) to allow your frontend to communi
 
 | Variable | Description | Purpose |
 |----------|-------------|---------|
-| `JWT_SECRET` | 64-character secret for JWT tokens | Secure token generation |
+| `JWT_SECRET` | 32-byte Base64 encoded secret for JWT tokens | Secure token generation |
 | `MYSQL_ROOT_PASSWORD` | Database root password | Database security |
 | `CORS_ALLOWED_ORIGINS` | Allowed frontend domains | Cross-origin security |
 | `REACT_APP_API_URL` | Backend API URL | Frontend-backend communication |
