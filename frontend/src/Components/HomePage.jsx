@@ -58,10 +58,17 @@ function HomePage() {
         Authorization: `Bearer ${token}`,
         "X-XSRF-TOKEN": getCookie("XSRF-TOKEN"),
       },
+      reconnectDelay: 10000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       onConnect: onConnect,
       onStompError: onError,
       onWebSocketError: (error) => {
         console.error("WebSocket error:", error);
+      },
+      onWebSocketClose: () => {
+        console.log("WebSocket connection closed");
+        setIsConnected(false);
       },
       debug: (str) => {
         console.log('STOMP: ' + str);
