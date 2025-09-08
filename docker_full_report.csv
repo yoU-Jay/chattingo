@@ -1,0 +1,5 @@
+Stage,Dockerfile_Type,Cold_Build_Backend(s),Cold_Build_Frontend(s),Cold_Build_Total(s),Warm_Build_Backend(s),Warm_Build_Frontend(s),Warm_Build_Total(s),Cold_Startup_Backend(s),Cold_Startup_Frontend(s),Cold_Startup_Total(s),Warm_Startup_Backend(s),Warm_Startup_Frontend(s),Warm_Startup_Total(s),Backend_Mem(MB),Frontend_Mem(MB),Total_Mem(MB),Backend_Size(MB),Frontend_Size(MB),Backend_Layers,Frontend_Layers,Notes
+Stage1,Single-Stage,70,372,442,4,13,17,543,543,1086,564,564,1128,271,10,281,683,2.34GB,32,23,First run / cold build
+Stage2,2-Stage,40,332,372,4,7,11,416,417,833,432,432,864,330,12,342,464,62.2,14,23,First run / cold build
+Stage3,3-Stage,73,370,443,4,8,12,550,550,1100,566,566,1132,257,12,269,237,62.2,16,23,First run / cold build
+Stage4,3-Stage-Optimized,55,299,354,5,9,14,435,435,870,453,453,906,286,12,298,237,62.2,18,24,First run / cold build

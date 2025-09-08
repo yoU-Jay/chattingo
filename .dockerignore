@@ -1,0 +1,25 @@
+# Node / React
+node_modules
+npm-debug.log
+build
+.DS_Store
+
+# Java / Maven
+target
+*.log
+*.tmp
+*.bak
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE / editor
+.vscode
+.idea
+*.swp
