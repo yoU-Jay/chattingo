@@ -35,6 +35,7 @@ yarn-error.log*
 # Frontend build output
 /frontend/build
 /frontend/dist
+!/frontend/.env
 
 # Backend build output
 /backend/target/
