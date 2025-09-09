@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     DOCKERHUB_CREDS = 'dockerhub-creds'  // Jenkins credential ID
-    DEPLOY_DIR = "/opt/chattingo"        // deployment directory on VPS
+    DEPLOY_DIR = "/opt/chattingo_env"        // deployment directory on VPS
   }
 
   stages {
