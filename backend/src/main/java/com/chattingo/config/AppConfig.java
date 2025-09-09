@@ -63,7 +63,7 @@ public class AppConfig {
 
                         return cfg;
                     }
-                })).formLogin(Customizer.withDefaults()).httpBasic(Customizer.withDefaults());
+                }))
 
         return http.build();
     }
