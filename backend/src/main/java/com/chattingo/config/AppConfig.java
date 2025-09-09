@@ -63,7 +63,7 @@ public class AppConfig {
 
                         return cfg;
                     }
-                }))
+                }));
 
         return http.build();
     }
