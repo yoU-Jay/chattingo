@@ -42,13 +42,13 @@ services:
     restart: unless-stopped
     ports:
       - "3000:80"
-    env_file:
-      - .env
-    environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL}
-      REACT_APP_WS_URL: ${REACT_APP_WS_URL}
-      REACT_APP_ENV: ${REACT_APP_ENV}
-      REACT_APP_DEBUG: ${REACT_APP_DEBUG}
+    # env_file:
+    #   - .env
+    # environment:
+    #   REACT_APP_API_URL: ${REACT_APP_API_URL}
+    #   REACT_APP_WS_URL: ${REACT_APP_WS_URL}
+    #   REACT_APP_ENV: ${REACT_APP_ENV}
+    #   REACT_APP_DEBUG: ${REACT_APP_DEBUG}
     depends_on:
       - backend
 
