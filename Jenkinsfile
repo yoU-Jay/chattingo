@@ -62,24 +62,28 @@ pipeline {
 
     stage('Update deploy .env') {
       steps {
-        // modify deploy .env in DEPLOY_DIR (make backup first)
         sh """
           cd ${DEPLOY_DIR}
           cp .env .env.bak.${BUILD_NUMBER}
-          # update or add BACKEND_TAG/FRONTEND_TAG (create if not present)
+    
+          # update or add BACKEND_TAG/FRONTEND_TAG
           if grep -q '^BACKEND_TAG=' .env; then
-            sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
+              sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
           else
-            echo "BACKEND_TAG=${IMAGE_TAG}" >> .env
+              echo "BACKEND_TAG=${IMAGE_TAG}" >> .env
           fi
           if grep -q '^FRONTEND_TAG=' .env; then
-            sed -i 's|^FRONTEND_TAG=.*|FRONTEND_TAG=${IMAGE_TAG}|' .env
+              sed -i 's|^FRONTEND_TAG=.*|FRONTEND_TAG=${IMAGE_TAG}|' .env
           else
-            echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
+              echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
           fi
+    
+          # now copy the updated .env into workspace for docker compose
+          cp .env ${WORKSPACE}/.env
         """
       }
     }
+
 
     stage('Deploy (docker compose)') {
       steps {
