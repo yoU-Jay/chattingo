@@ -65,7 +65,7 @@ pipeline {
         sh """
           cd ${DEPLOY_DIR}
           cp .env .env.bak.${BUILD_NUMBER}
-    
+
           # update or add BACKEND_TAG/FRONTEND_TAG
           if grep -q '^BACKEND_TAG=' .env; then
               sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
@@ -77,7 +77,7 @@ pipeline {
           else
               echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
           fi
-    
+
           # now copy the updated .env into workspace for docker compose
           cp .env ${WORKSPACE}/.env
         """
@@ -88,7 +88,6 @@ pipeline {
     stage('Deploy (docker compose)') {
       steps {
         sh """
-          cd ${DEPLOY_DIR}
           docker-compose pull
           docker-compose up -d --remove-orphans
         """
