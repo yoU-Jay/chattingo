@@ -48,18 +48,14 @@ pipeline {
     stage('Push Images') {
       steps {
         withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-          script {
-              BACKEND_REPO = "${DH_USER}/chattingo-backend"
-              FRONTEND_REPO = "${DH_USER}/chattingo-frontend"
-          }
-          sh '''
+          sh """
             echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-            docker push ${BACKEND_REPO}:${IMAGE_TAG}
-            docker push ${BACKEND_REPO}:latest
-            docker push ${FRONTEND_REPO}:${IMAGE_TAG}
-            docker push ${FRONTEND_REPO}:latest
+            docker push ${env.BACKEND_REPO}:${IMAGE_TAG}
+            docker push ${env.BACKEND_REPO}:latest
+            docker push ${env.FRONTEND_REPO}:${IMAGE_TAG}
+            docker push ${env.FRONTEND_REPO}:latest
             docker logout
-          '''
+          """
         }
       }
     }
