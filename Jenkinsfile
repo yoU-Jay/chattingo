@@ -18,6 +18,17 @@ pipeline {
       }
     }
 
+    stage('Set Repo Names') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+          script {
+            env.BACKEND_REPO = "${DH_USER}/chattingo-backend"
+            env.FRONTEND_REPO = "${DH_USER}/chattingo-frontend"
+          }
+        }
+      }
+    }
+
     stage('Build Backend Image') {
       steps {
         sh """
