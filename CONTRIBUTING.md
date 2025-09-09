@@ -12,23 +12,51 @@
 
 ## 🚀 Development Setup
 
+### Quick Start (TL;DR)
+
+For experienced developers who want to get started immediately:
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/iemafzalhassan/chattingo.git
+cd chattingo
+
+# 2. Database setup
+mysql -u root -p -e "CREATE DATABASE chattingo_db;"
+
+# 3. Backend setup
+cd backend
+cp .env.example .env
+# Edit .env: Set JWT_SECRET (use: openssl rand -base64 32)
+./mvnw spring-boot:run &
+
+# 4. Frontend setup (new terminal)
+cd ../frontend
+cp .env.example .env
+npm install
+npm start
+
+# 5. Open http://localhost:3000
+```
+
+**Requirements**: Java 17+, Node.js 18+, MySQL 8.0+
+
 ### Prerequisites
 - **Java 17+** (OpenJDK recommended)
 - **Node.js 18+** 
 - **MySQL 8.0+**
 - **Git** (for version control)
+- **Maven 3.6+** (or use included wrapper)
 
-### Quick Start for Hackathon Participants
+### Local Environment Setup
 
-#### **Step 1: Fork & Clone the Repository**
+#### **Step 1: Clone the Repository**
 ```bash
-# 1. Fork this repository on GitHub: https://github.com/iemafzalhassan/chattingo
-# 2. Clone your fork locally
-git clone https://github.com/YOUR_USERNAME/chattingo.git
+git clone https://github.com/iemafzalhassan/chattingo.git
 cd chattingo
 ```
 
-#### **Step 2: Install Dependencies**
+#### **Step 2: Install System Dependencies**
 
 **On macOS:**
 ```bash
@@ -37,20 +65,25 @@ brew install openjdk@17
 echo 'export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
+# Install Node.js 18+
+brew install node@18
+
 # Install MySQL
 brew install mysql
 brew services start mysql
 
 # Verify installations
-java -version
-node -v
-mysql --version
+java -version    # Should show Java 17
+node -v         # Should show v18+
+mysql --version # Should show MySQL 8.0+
 ```
 
 **On Ubuntu/Debian:**
 ```bash
-# Install Java 17
+# Update package list
 sudo apt update
+
+# Install Java 17
 sudo apt install openjdk-17-jdk
 
 # Install Node.js 18
@@ -60,176 +93,320 @@ sudo apt-get install -y nodejs
 # Install MySQL
 sudo apt install mysql-server
 sudo systemctl start mysql
+sudo systemctl enable mysql
+
+# Verify installations
+java -version
+node -v
+mysql --version
 ```
 
 **On Windows:**
-```bash
-# Download and install from official websites:
-# - Java 17: https://adoptium.net/
-# - Node.js 18: https://nodejs.org/
-# - MySQL: https://dev.mysql.com/downloads/mysql/
-```
+1. **Java 17**: Download from [Adoptium](https://adoptium.net/) and install
+2. **Node.js 18+**: Download from [nodejs.org](https://nodejs.org/) and install
+3. **MySQL 8.0+**: Download from [MySQL Downloads](https://dev.mysql.com/downloads/mysql/) and install
 
-#### **Step 3: Setup Database**
+#### **Step 3: Database Setup**
 ```bash
-# Connect to MySQL (no password for fresh install)
-mysql -u root
+# Connect to MySQL
+mysql -u root -p
 
-# Create database
+# Create database and user
 CREATE DATABASE chattingo_db;
-exit
+CREATE USER 'chattingo'@'localhost' IDENTIFIED BY 'password123';
+GRANT ALL PRIVILEGES ON chattingo_db.* TO 'chattingo'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# Test connection
+mysql -u chattingo -p chattingo_db
 ```
 
-#### **Step 4: Configure Backend**
+#### **Step 4: Backend Configuration**
 ```bash
 cd backend
 
 # Copy environment template
 cp .env.example .env
 
-# Generate secure JWT secret (32 bytes = 256 bits)
+# Generate secure JWT secret
 openssl rand -base64 32
 
-# Edit .env file with your generated JWT secret:
+# Edit .env file with your configuration:
 # JWT_SECRET=<your-generated-secret>
-# Leave SPRING_DATASOURCE_PASSWORD empty for local MySQL
+# SPRING_DATASOURCE_PASSWORD=password123
+# Or leave empty if using root without password
 ```
 
-#### **Step 5: Start Backend**
+#### **Step 5: Frontend Configuration**
 ```bash
-# From backend directory
-./mvnw spring-boot:run
-```
-
-#### **Step 6: Configure Frontend**
-```bash
-cd frontend
+cd ../frontend
 
 # Copy environment template
 cp .env.example .env
 
 # Install dependencies
 npm install
+
+# Verify .env contains:
+# REACT_APP_API_URL=http://localhost:8080
+# REACT_APP_WS_URL=http://localhost:8080/ws
 ```
 
-#### **Step 7: Start Frontend**
+#### **Step 6: Start the Application**
+
+**Terminal 1 - Backend:**
 ```bash
-# Start development server
+cd backend
+./mvnw spring-boot:run
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
 npm start
 ```
 
-#### **Step 8: Verify Setup**
+#### **Step 7: Verify Setup**
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080
 - **Health Check**: http://localhost:8080/actuator/health
-- **Test signup**: Create a new user account
+- **Database**: Tables auto-created by Hibernate
+
+#### **Step 8: Test the Application**
+1. Open http://localhost:3000 in your browser
+2. Register a new user account
+3. Login with your credentials
+4. Test real-time messaging features
+
+### Local Development Troubleshooting
+
+#### **Java Issues**
+```bash
+# "Java not found" or wrong version
+# macOS
+brew install openjdk@17
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+
+# Ubuntu/Debian
+sudo apt install openjdk-17-jdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+# Windows - Set JAVA_HOME in System Environment Variables
+# Point to your Java 17 installation directory
+```
+
+#### **MySQL Connection Issues**
+```bash
+# "Connection refused" or "Access denied"
+# Start MySQL service
+sudo systemctl start mysql    # Linux
+brew services start mysql     # macOS
+
+# Reset MySQL root password (if needed)
+sudo mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'newpassword';
+FLUSH PRIVILEGES;
+EXIT;
+
+# Test connection
+mysql -u root -p -e "SELECT VERSION();"
+```
+
+#### **Backend Startup Issues**
+```bash
+# "Port 8080 already in use"
+lsof -ti:8080 | xargs kill -9
+
+# "JWT secret too short" - Generate proper secret
+openssl rand -base64 32
+
+# "Database connection failed" - Check .env file
+cat backend/.env | grep DATASOURCE
+
+# "Maven wrapper not executable"
+chmod +x mvnw
+
+# Clean and rebuild
+./mvnw clean install
+```
+
+#### **Frontend Issues**
+```bash
+# "Port 3000 already in use"
+lsof -ti:3000 | xargs kill -9
+
+# "npm install fails" - Clear cache
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+
+# "Module not found" errors
+npm install --legacy-peer-deps
+
+# "CORS errors" - Check backend .env
+# Ensure CORS_ALLOWED_ORIGINS includes http://localhost:3000
+```
+
+#### **WebSocket Connection Issues**
+```bash
+# Test WebSocket endpoint
+curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" \
+  http://localhost:8080/ws
+
+# Check browser console for WebSocket errors
+# Verify REACT_APP_WS_URL in frontend/.env
+# Ensure backend is running on port 8080
+```
+
+#### **Database Schema Issues**
+```bash
+# Tables not created automatically
+# Check application.properties for:
+# spring.jpa.hibernate.ddl-auto=update
+
+# Manual table creation (if needed)
+mysql -u root -p chattingo_db < backend/init.sql
+
+# View created tables
+mysql -u root -p -e "USE chattingo_db; SHOW TABLES;"
+```
+
+#### **Environment Variable Issues**
+```bash
+# Backend not reading .env file
+# Ensure .env is in backend/ directory
+ls -la backend/.env
+
+# Frontend environment variables not working
+# Ensure variables start with REACT_APP_
+# Restart development server after changes
+```
 
 ### Development Workflow
 
 #### **Making Changes**
-1. **Backend changes**: Restart with `./mvnw spring-boot:run`
-2. **Frontend changes**: Hot reload automatically updates
-3. **Database changes**: Hibernate auto-updates schema
+1. **Backend changes**: 
+   - Stop server (Ctrl+C)
+   - Make changes
+   - Restart: `./mvnw spring-boot:run`
+
+2. **Frontend changes**: 
+   - Changes auto-reload in development
+   - For environment changes, restart: `npm start`
+
+3. **Database changes**: 
+   - Hibernate auto-updates schema in development
+   - For major changes, drop and recreate database
 
 #### **Testing API Endpoints**
 ```bash
-# Test signup
+# Test user registration
 curl -X POST http://localhost:8080/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"fullName":"Test User","email":"test@example.com","password":"password123"}'
+  -d '{
+    "fullName": "Test User",
+    "email": "test@example.com", 
+    "password": "password123"
+  }'
 
-# Test login
+# Test user login
 curl -X POST http://localhost:8080/auth/signin \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
+  -d '{
+    "email": "test@example.com",
+    "password": "password123"
+  }'
+
+# Test protected endpoint (replace TOKEN with actual JWT)
+curl -H "Authorization: Bearer TOKEN" \
+  http://localhost:8080/api/user/profile
 ```
 
-### Common Issues & Solutions
+#### **Debugging Tips**
+1. **Backend logs**: Check console output for Spring Boot logs
+2. **Frontend logs**: Open browser DevTools → Console
+3. **Network requests**: DevTools → Network tab
+4. **Database queries**: Enable SQL logging in application.properties
+5. **WebSocket messages**: DevTools → Network → WS tab
 
-#### **"Java not found"**
+### IDE Setup & Development Tools
+
+#### **Recommended IDEs**
+
+**For Backend (Java/Spring Boot):**
+- **IntelliJ IDEA** (Community/Ultimate)
+- **Eclipse IDE** with Spring Tools
+- **VS Code** with Java Extension Pack
+
+**For Frontend (React):**
+- **VS Code** with React extensions
+- **WebStorm** (JetBrains)
+- **Atom** with React packages
+
+#### **VS Code Extensions**
 ```bash
-# macOS
-brew install openjdk@17
-export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
-
-# Ubuntu
-sudo apt install openjdk-17-jdk
-
-# Windows
-# Download from https://adoptium.net/
+# Install recommended extensions
+code --install-extension vscjava.vscode-java-pack
+code --install-extension ms-vscode.vscode-spring-initializr
+code --install-extension bradlc.vscode-tailwindcss
+code --install-extension esbenp.prettier-vscode
+code --install-extension ms-vscode.vscode-json
 ```
 
-#### **"MySQL connection refused"**
+#### **IntelliJ IDEA Setup**
+1. **Import Project**: File → Open → Select `chattingo` folder
+2. **Configure JDK**: File → Project Structure → Project → SDK (Java 17)
+3. **Enable Annotation Processing**: Settings → Build → Compiler → Annotation Processors
+4. **Install Plugins**: Spring Boot, Lombok (if used)
+
+#### **Database Tools**
+- **MySQL Workbench**: GUI for database management
+- **DBeaver**: Universal database tool
+- **phpMyAdmin**: Web-based MySQL administration
+- **Command line**: `mysql -u root -p chattingo_db`
+
+#### **API Testing Tools**
+- **Postman**: GUI for API testing
+- **Insomnia**: Alternative to Postman
+- **curl**: Command-line HTTP client
+- **HTTPie**: User-friendly curl alternative
+
+#### **Development Workflow Tools**
 ```bash
-# Start MySQL service
-# macOS: brew services start mysql
-# Ubuntu: sudo systemctl start mysql
-# Windows: Start MySQL service from Services
+# Hot reload for backend (Spring Boot DevTools)
+# Add to pom.xml dependencies:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+</dependency>
 
-# Create database
-mysql -u root -e "CREATE DATABASE chattingo_db;"
+# Frontend hot reload (included with React)
+# Automatically reloads on file changes
+
+# Database migrations (if needed)
+# Use Flyway or Liquibase for production
 ```
 
-#### **"JWT secret too short" or "WeakKeyException"**
+#### **Git Workflow for Contributors**
 ```bash
-# Generate proper 256-bit secret
-openssl rand -base64 32
-# Copy output to JWT_SECRET in .env
+# Fork the repository on GitHub first
+git clone https://github.com/YOUR_USERNAME/chattingo.git
+cd chattingo
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+
+# Make changes and commit
+git add .
+git commit -m "Add: your feature description"
+
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Create Pull Request on GitHub
 ```
-
-#### **"CORS errors in browser"**
-- Verify `CORS_ALLOWED_ORIGINS` includes your frontend URL
-- Restart backend after changing CORS settings
-
-#### **"Port already in use"**
-```bash
-# Find and kill process using port
-lsof -ti:8080 | xargs kill -9  # Backend
-lsof -ti:3000 | xargs kill -9  # Frontend
-```
-
-#### **"npm install fails"**
-```bash
-# Clear npm cache
-npm cache clean --force
-
-# Delete node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### **"Backend won't start"**
-```bash
-# Check if port 8080 is in use
-lsof -ti:8080 | xargs kill -9
-
-# Check Java version (must be 17+)
-java -version
-
-# Check if database is running
-brew services start mysql  # macOS
-sudo systemctl start mysql  # Linux
-```
-
-#### **"Frontend won't start"**
-```bash
-# Check if port 3000 is in use
-lsof -ti:3000 | xargs kill -9
-
-# Check Node.js version (must be 18+)
-node -v
-
-# Clear npm cache and reinstall
-npm cache clean --force
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### **"WebSocket connection failed"**
-- Ensure backend is running on port 8080
-- Check browser console for CORS errors
-- Verify `REACT_APP_WS_URL` in frontend .env file
-- Test WebSocket endpoint: `curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" http://localhost:8080/ws`
 
 ---
 

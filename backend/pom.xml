@@ -69,6 +69,7 @@
 				spring-boot-starter-web
 			</artifactId>
 		</dependency>
+		<!-- Temporarily disabled due to Docker compatibility issues
 		<dependency>
 			<groupId>
 				org.springframework.boot
@@ -77,6 +78,7 @@
 				spring-boot-starter-actuator
 			</artifactId>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>
 				org.springframework.boot
