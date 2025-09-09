@@ -3,8 +3,6 @@ pipeline {
 
   environment {
     DOCKERHUB_CREDS = 'dockerhub-creds'  // Jenkins credential ID
-    BACKEND_REPO = "YOUR_DOCKERHUB_USER/chattingo-backend"
-    FRONTEND_REPO = "YOUR_DOCKERHUB_USER/chattingo-frontend"
     DEPLOY_DIR = "/opt/chattingo"        // deployment directory on VPS
   }
 
