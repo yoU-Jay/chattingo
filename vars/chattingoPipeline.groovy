@@ -101,7 +101,6 @@ def call(Map config = [:]) {
                     sh """
                         cp ${DEPLOY_DIR}/.env ${WORKSPACE}/.env
                         cp ${WORKSPACE}/.env ${WORKSPACE}/.env.bak.${BUILD_NUMBER}
-                        cat ${WORKSPACE}/.env
                         if grep -q '^BACKEND_TAG=' .env; then
                             sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
                         else
@@ -112,7 +111,7 @@ def call(Map config = [:]) {
                         else
                             echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
                         fi
-                        cat ${WORKSPACE}/.env
+                        cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
                     """
                 }
             }
@@ -136,15 +135,28 @@ def call(Map config = [:]) {
                             """
                             echo "Health check passed ✅"
                         } catch (err) {
-                            echo "Health check failed ❌. Rolling back to previous deployment..."
-                            // restore old .env
-                            sh """
-                                cp ${WORKSPACE}/.env.bak.${BUILD_NUMBER} ${WORKSPACE}/.env
-                                docker compose pull
-                                docker compose up -d --remove-orphans
-                            """
-                            error("Deployment failed. Rolled back to previous version.")
+                            echo "Health check failed ❌"
+                            env.ROLLBACK_TRIGGERED = 'true'
+                            error("Deployment failed. Rollback stage will run.")
                         }
+                    }
+                }
+            }
+
+            stage('Rollback') {
+                when {
+                    expression { currentBuild.result == 'FAILURE' && env.ROLLBACK_TRIGGERED == 'true' }
+                }
+                steps {
+                    script {
+                        echo "Performing rollback..."
+                        sh """
+                            cp ${DEPLOY_DIR}/.env.bak ${DEPLOY_DIR}/.env
+                            cp ${DEPLOY_DIR}/.env ${WORKSPACE}/.env
+                            docker compose --env-file ${WORKSPACE}/.env pull
+                            docker compose --env-file ${WORKSPACE}/.env up -d --remove-orphans
+                        """
+                        echo "Rollback complete ✅"
                     }
                 }
             }
