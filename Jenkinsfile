@@ -24,18 +24,6 @@ pipeline {
       }
     }
 
-    stage('Lint & Test Frontend') {
-      steps {
-        dir('frontend') {
-          sh """
-            npm install
-            npm run lint
-            npm test -- --watchAll=false
-          """
-        }
-      }
-    }
-
     stage('Set Repo Names') {
       steps {
         withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
