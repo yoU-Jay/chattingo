@@ -5,13 +5,16 @@ RUN npm ci
 
 # Stage 2: Build
 FROM deps AS build
+COPY --from=deps /app/node_modules /app/node_modules
 COPY . .
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
 RUN npm run build
 
 # Stage 3: Runtime
 FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/build /usr/share/nginx/html
+COPY public/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build .
 
 EXPOSE 80
