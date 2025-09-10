@@ -10,7 +10,7 @@ def call(Map config = [:]) {
         environment {
             DOCKERHUB_CREDS = "${DOCKERHUB_CREDS}"
             DEPLOY_DIR = "${DEPLOY_DIR}"
-            ROLLBACK_REQUIRED = 'false'
+            HEALTH_CHECK_PASS = 'false'
         } 
 
         stages {
@@ -134,7 +134,7 @@ def call(Map config = [:]) {
                                 curl -f http://localhost:3000
                             """
                             echo "Health check passed ✅"
-                            env.ROLLBACK_REQUIRED = 'false'
+                            env.HEALTH_CHECK_PASS = 'true'
 
                             sh """
                                 cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
@@ -144,7 +144,7 @@ def call(Map config = [:]) {
                         script {
                             if (currentBuild.currentResult == 'FAILURE') {
                                 echo "Health check failed ❌. Triggering rollback..."
-                                env.ROLLBACK_REQUIRED = 'false'
+                                env.HEALTH_CHECK_PASS = 'false'
                             }
                         }
                     }
@@ -152,7 +152,7 @@ def call(Map config = [:]) {
             }
 
             stage('Rollback') {
-                when { expression { env.ROLLBACK_REQUIRED != 'false' } }
+                when { expression { env.HEALTH_CHECK_PASS != 'true' } }
                 steps {
                     sh """
                         cp ${DEPLOY_DIR}/.env.bak ${WORKSPACE}/.env
