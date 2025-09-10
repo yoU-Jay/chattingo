@@ -20,21 +20,21 @@ pipeline {
 
     stage('Filesystem Scan') {
       steps {
-        sh '''
+        sh """
           echo "Running Trivy Filesystem Scan"
           trivy fs --exit-code 0 --severity HIGH,CRITICAL .
-        '''
+        """
       }
     }
   
     stage('Config Scan') {
       steps {
-        sh '''
+        sh """
           echo "⚙️ Running Trivy Config Scan on docker-compose.yml and Dockerfiles..."
           trivy config --exit-code 0 --severity HIGH,CRITICAL ./docker-compose.yml
           trivy config --exit-code 0 --severity HIGH,CRITICAL ./backend/Dockerfile
           trivy config --exit-code 0 --severity HIGH,CRITICAL ./frontend/Dockerfile
-        '''
+        """
       }
     }
 
@@ -67,11 +67,11 @@ pipeline {
 
     stage('Image Scan') {
       steps {
-        sh '''
+        sh """
           echo "Running Trivy Image Scan"
           trivy image --exit-code 0 --severity HIGH,CRITICAL ${BACKEND_REPO}:${IMAGE_TAG}
           trivy image --exit-code 0 --severity HIGH,CRITICAL ${FRONTEND_REPO}:${IMAGE_TAG}
-        '''
+        """
       }
     }
 
