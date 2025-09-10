@@ -119,9 +119,7 @@ pipeline {
         """
       }
     }
-
-  }
-
+    
     stage('Health Check') {
       steps {
         script {
@@ -133,6 +131,8 @@ pipeline {
       }
     }
   }
+
+
 
   post {
     success {
