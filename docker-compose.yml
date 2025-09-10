@@ -13,6 +13,8 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - appnet
 
   backend:
     image: ${BACKEND_REPO}:${BACKEND_TAG}
@@ -33,6 +35,8 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SERVER_PORT: ${SERVER_PORT}
       WEBSOCKET_ENDPOINT: ${WEBSOCKET_ENDPOINT}
+    networks:
+      - appnet
     depends_on:
       - db
 
@@ -51,6 +55,28 @@ services:
     #   REACT_APP_DEBUG: ${REACT_APP_DEBUG}
     depends_on:
       - backend
+    networks:
+      - appnet
+
+  nginx:
+    image: nginx:alpine
+    container_name: chattingo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      #- "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      #- /root/chattingo/certbot/conf:/etc/letsencrypt:ro
+      #- /root/chattingo/certbot/www:/var/www/certbot:ro
+    networks:
+      - appnet
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
-  db_data:   
+  db_data: 
+
+networks:
+  appnet:  
