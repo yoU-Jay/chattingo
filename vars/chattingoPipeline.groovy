@@ -101,6 +101,7 @@ def call(Map config = [:]) {
                     sh """
                         cp ${DEPLOY_DIR}/.env ${WORKSPACE}/.env
                         cp ${WORKSPACE}/.env ${WORKSPACE}/.env.bak.${BUILD_NUMBER}
+                        cat ${WORKSPACE}/.env
                         if grep -q '^BACKEND_TAG=' .env; then
                             sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
                         else
@@ -111,6 +112,7 @@ def call(Map config = [:]) {
                         else
                             echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
                         fi
+                        cat ${WORKSPACE}/.env
                     """
                 }
             }
@@ -124,12 +126,25 @@ def call(Map config = [:]) {
                 }
             }
 
-            stage('Health Check') {
-                steps {
-                    sh """
-                        sleep 10
-                        curl -f http://localhost:3000 || exit 1
-                    """
+        stage('Health Check') {
+            steps {
+                script {
+                    try {
+                        sh """
+                            sleep 10
+                            curl -f http://localhost:3001
+                        """
+                        echo "Health check passed ✅"
+                    } catch (err) {
+                        echo "Health check failed ❌. Rolling back to previous deployment..."
+                        // restore old .env
+                        sh """
+                            cp ${WORKSPACE}/.env.bak.${BUILD_NUMBER} ${WORKSPACE}/.env
+                            docker compose pull
+                            docker compose up -d --remove-orphans
+                        """
+                        error("Deployment failed. Rolled back to previous version.")
+                    }
                 }
             }
         }
