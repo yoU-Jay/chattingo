@@ -112,7 +112,6 @@ def call(Map config = [:]) {
                         else
                             echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
                         fi
-                        cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
                     """
                 }
             }
@@ -136,6 +135,11 @@ def call(Map config = [:]) {
                             """
                             echo "Health check passed ✅"
                             env.ROLLBACK_TRIGGERED = 'false'
+
+                            sh """
+                                cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
+                            """
+                            
                         }
                         script {
                             if (currentBuild.currentResult == 'FAILURE') {
