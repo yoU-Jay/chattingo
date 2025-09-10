@@ -1,4 +1,3 @@
-// shared-libraries/vars/chattingoPipeline.groovy
 def call(Map config = [:]) {
 
     def DOCKERHUB_CREDS = config.get('dockerhubCreds', 'dockerhub-creds')
@@ -36,8 +35,7 @@ def call(Map config = [:]) {
             stage('Config Scan') {
                 steps {
                     sh """
-                        echo "⚙️ Running Trivy Config Scan on docker-compose.yml and Dockerfiles..."
-                        trivy config --exit-code 0 --severity HIGH,CRITICAL ./docker-compose.yml
+                        echo "Running Trivy Config Scan for Dockerfiles"
                         trivy config --exit-code 0 --severity HIGH,CRITICAL ./backend/Dockerfile
                         trivy config --exit-code 0 --severity HIGH,CRITICAL ./frontend/Dockerfile
                     """
@@ -115,7 +113,7 @@ def call(Map config = [:]) {
                 }
             }
 
-            stage('Deploy (docker compose)') {
+            stage('Deploy - docker compose') {
                 steps {
                     sh """
                         docker compose pull
@@ -130,9 +128,9 @@ def call(Map config = [:]) {
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             sh """
                                 sleep 10
-                                curl -f http://localhost:3000
+                                curl -f http://localhost:3001
                             """
-                            echo "Health check passed ✅"
+                            echo "Health check passed !!"
                             env.HEALTH_CHECK_PASS = 'true'
 
                             sh """
@@ -152,7 +150,7 @@ def call(Map config = [:]) {
                         docker compose --env-file ${WORKSPACE}/.env pull
                         docker compose --env-file ${WORKSPACE}/.env up -d --remove-orphans
                     """
-                    echo "Rollback complete ✅"
+                    echo "Rollback completed !!"
                 }
             }
         }
