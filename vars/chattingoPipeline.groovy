@@ -128,30 +128,28 @@ def call(Map config = [:]) {
             stage('Health Check') {
                 steps {
                     script {
-                        env.ROLLBACK_TRIGGERED = 'false'
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             sh """
                                 sleep 10
                                 curl -f http://localhost:3001
                             """
                             echo "Health check passed ✅"
-                            env.ROLLBACK_TRIGGERED = 'true'
                         }
-                        // Set flag if stage failed
-                        if (currentBuild.rawBuild.getExecution().getStageStates().find { it.name == 'Health Check' }?.result?.toString() == 'FAILURE') {
-                            echo "Health check failed ❌. Triggering rollback..."
-                            env.ROLLBACK_TRIGGERED = 'true'
+                        script {
+                            if (currentBuild.currentResult == 'FAILURE') {
+                                echo "Health check failed ❌. Triggering rollback..."
+                                env.ROLLBACK_TRIGGERED = 'true'
+                            }
                         }
                     }
                 }
             }
 
             stage('Rollback') {
-                when { expression { env.ROLLBACK_TRIGGERED != 'true' } }
+                when { expression { env.ROLLBACK_TRIGGERED == 'true' } }
                 steps {
                     sh """
-                        cp ${DEPLOY_DIR}/.env.bak ${DEPLOY_DIR}/.env
-                        cp ${DEPLOY_DIR}/.env ${WORKSPACE}/.env
+                        cp ${DEPLOY_DIR}/.env.bak ${WORKSPACE}/.env
                         docker compose --env-file ${WORKSPACE}/.env pull
                         docker compose --env-file ${WORKSPACE}/.env up -d --remove-orphans
                     """
