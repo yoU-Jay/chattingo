@@ -126,29 +126,29 @@ def call(Map config = [:]) {
                 }
             }
 
-        stage('Health Check') {
-            steps {
-                script {
-                    try {
-                        sh """
-                            sleep 10
-                            curl -f http://localhost:3001
-                        """
-                        echo "Health check passed ✅"
-                    } catch (err) {
-                        echo "Health check failed ❌. Rolling back to previous deployment..."
-                        // restore old .env
-                        sh """
-                            cp ${WORKSPACE}/.env.bak.${BUILD_NUMBER} ${WORKSPACE}/.env
-                            docker compose pull
-                            docker compose up -d --remove-orphans
-                        """
-                        error("Deployment failed. Rolled back to previous version.")
+            stage('Health Check') {
+                steps {
+                    script {
+                        try {
+                            sh """
+                                sleep 10
+                                curl -f http://localhost:3001
+                            """
+                            echo "Health check passed ✅"
+                        } catch (err) {
+                            echo "Health check failed ❌. Rolling back to previous deployment..."
+                            // restore old .env
+                            sh """
+                                cp ${WORKSPACE}/.env.bak.${BUILD_NUMBER} ${WORKSPACE}/.env
+                                docker compose pull
+                                docker compose up -d --remove-orphans
+                            """
+                            error("Deployment failed. Rolled back to previous version.")
+                        }
                     }
                 }
             }
         }
-
         post {
             success {
                 echo "Deployment successful: ${IMAGE_TAG}"
