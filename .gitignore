@@ -101,3 +101,6 @@ application.log
 # Temporary Maven files
 dependency-reduced-pom.xml
 email_system
+
+!/frontend/.env
+scp.sh
