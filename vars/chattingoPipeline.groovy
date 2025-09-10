@@ -10,7 +10,6 @@ def call(Map config = [:]) {
         environment {
             DOCKERHUB_CREDS = "${DOCKERHUB_CREDS}"
             DEPLOY_DIR = "${DEPLOY_DIR}"
-            HEALTH_CHECK_PASS = 'false'
         } 
 
         stages {
@@ -140,12 +139,6 @@ def call(Map config = [:]) {
                                 cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
                             """
                             
-                        }
-                        script {
-                            if (currentBuild.currentResult == 'FAILURE') {
-                                echo "Health check failed ❌. Triggering rollback..."
-                                env.HEALTH_CHECK_PASS = 'false'
-                            }
                         }
                     }
                 }
