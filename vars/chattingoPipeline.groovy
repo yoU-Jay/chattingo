@@ -99,8 +99,8 @@ def call(Map config = [:]) {
             stage('Update deploy .env') {
                 steps {
                     sh """
-                        cd ${DEPLOY_DIR}
-                        cp .env .env.bak.${BUILD_NUMBER}
+                        cp ${DEPLOY_DIR}/.env ${WORKSPACE}/.env
+                        cp ${WORKSPACE}/.env ${WORKSPACE}/.env.bak.${BUILD_NUMBER}
                         if grep -q '^BACKEND_TAG=' .env; then
                             sed -i 's|^BACKEND_TAG=.*|BACKEND_TAG=${IMAGE_TAG}|' .env
                         else
@@ -111,7 +111,6 @@ def call(Map config = [:]) {
                         else
                             echo "FRONTEND_TAG=${IMAGE_TAG}" >> .env
                         fi
-                        cp .env ${WORKSPACE}/.env
                     """
                 }
             }
