@@ -1,12 +1,15 @@
 // shared-libraries/vars/chattingoPipeline.groovy
 def call(Map config = [:]) {
 
+    def DOCKERHUB_CREDS = config.get('dockerhubCreds', 'dockerhub-creds')
+    def DEPLOY_DIR = config.get('deployDir', '/opt/chattingo_env')
+
     pipeline {
         agent any
 
         environment {
-            DOCKERHUB_CREDS = config.dockerhubCreds ?: 'dockerhub-creds'
-            DEPLOY_DIR = config.deployDir ?: "/opt/chattingo_env"
+            DOCKERHUB_CREDS = "${DOCKERHUB_CREDS}"
+            DEPLOY_DIR = "${DEPLOY_DIR}"
         }
 
         stages {
