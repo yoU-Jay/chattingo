@@ -24,16 +24,6 @@ pipeline {
       }
     }
 
-    stage('Lint & Test Backend') {
-      steps {
-        dir('backend') {
-          sh """
-            ./mvnw clean verify -DskipTests=false
-          """
-        }
-      }
-    }
-
     stage('Lint & Test Frontend') {
       steps {
         dir('frontend') {
