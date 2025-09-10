@@ -17,6 +17,34 @@ pipeline {
         }
       }
     }
+  
+    stage('Filesystem Security Scan') {
+      steps {
+        sh 'trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true'
+      }
+    }
+
+    stage('Lint & Test Backend') {
+      steps {
+        dir('backend') {
+          sh """
+            ./mvnw clean verify -DskipTests=false
+          """
+        }
+      }
+    }
+
+    stage('Lint & Test Frontend') {
+      steps {
+        dir('frontend') {
+          sh """
+            npm install
+            npm run lint
+            npm test -- --watchAll=false
+          """
+        }
+      }
+    }
 
     stage('Set Repo Names') {
       steps {
@@ -92,6 +120,18 @@ pipeline {
       }
     }
 
+  }
+
+    stage('Health Check') {
+      steps {
+        script {
+          sh """
+            sleep 10
+            curl -f http://localhost:3000 || exit 1
+          """
+        }
+      }
+    }
   }
 
   post {
