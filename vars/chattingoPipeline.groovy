@@ -131,7 +131,7 @@ def call(Map config = [:]) {
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             sh """
                                 sleep 10
-                                curl -f http://localhost:3001
+                                curl -f http://localhost:3000
                             """
                             echo "Health check passed ✅"
                             env.ROLLBACK_TRIGGERED = 'false'
@@ -165,7 +165,7 @@ def call(Map config = [:]) {
         }
         post {
             success {
-                echo "Deployment successful: ${IMAGE_TAG}"
+                echo "Deployment successful"
             }
             failure {
                 echo "Pipeline failed. Check console output."
