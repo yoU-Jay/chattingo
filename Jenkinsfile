@@ -17,10 +17,24 @@ pipeline {
         }
       }
     }
-  
-    stage('Filesystem Security Scan') {
+
+    stage('Filesystem Scan') {
       steps {
-        sh 'trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true'
+        sh '''
+          echo "Running Trivy Filesystem Scan"
+          trivy fs --exit-code 0 --severity HIGH,CRITICAL .
+        '''
+      }
+    }
+  
+    stage('Config Scan') {
+      steps {
+        sh '''
+          echo "⚙️ Running Trivy Config Scan on docker-compose.yml and Dockerfiles..."
+          trivy config --exit-code 0 --severity HIGH,CRITICAL ./docker-compose.yml
+          trivy config --exit-code 0 --severity HIGH,CRITICAL ./backend/Dockerfile
+          trivy config --exit-code 0 --severity HIGH,CRITICAL ./frontend/Dockerfile
+        '''
       }
     }
 
@@ -48,6 +62,16 @@ pipeline {
         sh """
           docker build -t ${FRONTEND_REPO}:${IMAGE_TAG} -t ${FRONTEND_REPO}:latest ./frontend
         """
+      }
+    }
+
+    stage('Image Scan') {
+      steps {
+        sh '''
+          echo "Running Trivy Image Scan"
+          trivy image --exit-code 0 --severity HIGH,CRITICAL ${BACKEND_REPO}:${IMAGE_TAG}
+          trivy image --exit-code 0 --severity HIGH,CRITICAL ${FRONTEND_REPO}:${IMAGE_TAG}
+        '''
       }
     }
 
