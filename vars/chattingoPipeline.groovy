@@ -11,7 +11,7 @@ def call(Map config = [:]) {
             DOCKERHUB_CREDS = "${DOCKERHUB_CREDS}"
             DEPLOY_DIR = "${DEPLOY_DIR}"
             ROLLBACK_TRIGGERED = ''
-        }
+        } 
 
         stages {
             stage('Checkout') {
