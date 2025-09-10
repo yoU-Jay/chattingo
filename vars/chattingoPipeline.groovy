@@ -10,7 +10,7 @@ def call(Map config = [:]) {
         environment {
             DOCKERHUB_CREDS = "${DOCKERHUB_CREDS}"
             DEPLOY_DIR = "${DEPLOY_DIR}"
-            ROLLBACK_REQUIRED = ''
+            ROLLBACK_REQUIRED = 'false'
         } 
 
         stages {
@@ -134,7 +134,7 @@ def call(Map config = [:]) {
                                 curl -f http://localhost:3000
                             """
                             echo "Health check passed ✅"
-                            env.ROLLBACK_REQUIRED  = 'false'
+                            env.ROLLBACK_REQUIRED = 'false'
 
                             sh """
                                 cp ${WORKSPACE}/.env ${DEPLOY_DIR}/.env.bak
