@@ -129,18 +129,17 @@ def call(Map config = [:]) {
             stage('Health Check') {
                 steps {
                     script {
-                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                            sh """
-                                sleep 10
-                                curl -f http://localhost:3001
-                            """
-                            echo "Health check passed ✅"
-                        }
-                        script {
-                            if (currentBuild.currentResult == 'FAILURE') {
-                                echo "Health check failed ❌. Triggering rollback..."
-                                env.ROLLBACK_TRIGGERED = "true"
+                        try {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                sh """
+                                    sleep 10
+                                    curl -f http://localhost:3001
+                                """
+                                echo "Health check passed ✅"
                             }
+                        } catch (err) {
+                            echo "Health check failed ❌. Triggering rollback..."
+                            env.ROLLBACK_TRIGGERED = "true"
                         }
                     }
                 }
