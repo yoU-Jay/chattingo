@@ -1,4 +1,5 @@
 // Jenkinsfile
+node {
 
 // Load the pipeline from your shared-libraries folder
 def chattingoPipeline = load 'shared-libraries/vars/chattingoPipeline.groovy'
@@ -8,3 +9,4 @@ chattingoPipeline(
     dockerhubCreds: 'dockerhub-creds',   // optional, defaults to same value in library
     deployDir: '/opt/chattingo_env'      // optional, defaults to same value in library
 )
+}
